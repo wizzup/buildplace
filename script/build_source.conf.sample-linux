@@ -1,0 +1,88 @@
+## Copyright (c) 2012 All Right Reserved, Wisut Hantanong
+##
+## This file is part of buildplace. see COPY.txt for license detail
+
+## This is a kind(subset) of yaml file (loaded using PYaml which some YAML feature migth not support, see http://pyyaml.org/) 
+## comment start with # (to end of line)
+## Don't use <TAP> for identation
+## if config failed to loaded first thing to check is identation consistency of each level
+
+##
+## common parameters
+##
+## noted that installation location for each source can be set in config_args (e.g., CMAKE_INSTALL_PREFIX, --prefix)
+## All xxx_path support ${ENV} expansion both in $LINUX and %WINDOWS form (expand using python os.path.expandvars())
+## One exception, don't use unix user home shorthand tilde (~) please use $HOME instead (build script not handle expansion correctly)
+##
+common:
+  envs: # these envs for all source, if you want to specify env just for one source use config_args with coresponding format
+    - BUILDPLACE_ROOT=$HOME/buildplace # specify a handy development root dir so we don't need to type absolute path
+  source_dir: $BUILDPLACE_ROOT/source # mostly read-only (except for bootstraping and source that not support out-of-source build)
+  build_dir: $BUILDPLACE_ROOT/build # build tree created by buildscript (if not exists)
+  log_dir: $BUILDPLACE_ROOT/log # build log saved here 
+
+##
+## source list
+##
+source:
+##
+## sorce list description
+## name: key for listing in listbox for selection (need to be unique)
+##   version: x.y.z vession string that name-x.y.z exists in source_dir
+##   config_cmd: cmake or configure
+##   config_args: arguments need for config_cmd (in raw format, i.e. -DXXX for cmake and --ABC for configure)
+##   build_cmd: make, ninja depends on how source is configure
+##   build_args: arguments need for build_cmd (e.g. all, install)
+##   envs: (optional) per source env for both config and build, for global env please use 'envs' in common section 
+##   prebuild_script: (optional) not yet support, script will be run before build (e.g. create/copy misc output dir)
+##   postbuild_script: (optional) not yet support, script will be run after build (e.g. if configurator not provide 'install' target)
+
+####################################################################################################
+## boost-svn.trunk
+####################################################################################################
+## below sample configuration will build boost-svn.trunk with python3
+## boost provide it own configurator ./bootstrap.sh(bat) and builder b2/bjam
+  boost:
+    version: svn.trunk
+    envs:
+    - CPLUS_INCLUDE_PATH=/usr/include/python3.2mu
+    config_cmd: ./bootstrap.sh
+    config_args:
+#    - --with-libraries=python,system,filesystem,thread,date_time,iostreams # comment this out if will all libraries (long time)
+    - --with-python=/usr/bin/python3
+    - --prefix=$BUILDPLACE_ROOT/install/boost-svn.trunk # set BOOST_ROOT to this location before call cmake findpackage(Boost)
+    build_cmd: ./b2
+    build_args: 
+    - --build-dir=$BUILDPLACE_ROOT/build/boost-svn.trunk
+    - install # boost will be installed to location defined by --prefix above
+
+####################################################################################################
+## cmake-git.trunk
+####################################################################################################
+## cmake can be configure using autoconfig and installed cmake (if any)
+## Linux, gcc
+  cmake:
+    version: git.trunk
+    config_cmd: cmake # or ./configure
+    config_args:
+    - -DBUILD_QtDialog=ON # build cmake-gui 
+    - -DBUILD_DOCUMENTATION=ON # build documentation
+    - -DCMAKE_BUILD_TYPE=Release # for gcc
+    build_cmd: make
+    build_args: 
+    - -j4
+    - install # may need to call build script with sudo if you want to install to default /usr/local/bin
+
+####################################################################################################
+## eigen-hg.trunk
+####################################################################################################
+  eigen:
+    version: hg.trunk
+    config_cmd: cmake
+    config_args:
+    - -DCMAKE_INSTALL_PREFIX=$BUILDPLACE_ROOT/install/eigen-hg.trunk
+    build_cmd: make
+    build_args: 
+    - -j4
+    - install
+
