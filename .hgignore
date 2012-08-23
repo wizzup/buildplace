@@ -1,5 +1,7 @@
 syntax: glob
 
+*.pyc
+
 ./source/* # this repo is for build tool only
 ./script/build_source.conf # user create local config by modify build_source.conf.<win/linux>-example
 
