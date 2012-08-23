@@ -1,8 +1,0 @@
-# add todo or wish list here
-TODO:
-    - prebuild/postbuild support
-    - `cmd` evaluation , e.g. `which python` = /usr/bin/python 
-
-# move what already done TODO: here
-DONE:
-    - per source env overide

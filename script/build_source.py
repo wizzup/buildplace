@@ -36,7 +36,7 @@ def main():
 	# DEBUG: clear console for easy debug message reading
 	if sys.platform == 'linux2': os.system('clear')
 
-	global CONFIGS # need this to tell python that we will write to global CONFIGS 
+	global CONFIGS # need this to tell python that we will write to global CONFIGS
 	global UIS # need this too for modifying the global UIS
 
 	CONFIGS = loadconfig() # we only want the log_dir
@@ -65,12 +65,12 @@ def main():
 	logger.debug('main: exit')
 	return
 
-# this enable config editing without script restart 
+# this enable config editing without script restart
 def reload_config():
 	global CONFIGS
 	global UIS
 
-	CONFIGS = loadconfig() 
+	CONFIGS = loadconfig()
 
 	# clear and fill listbox with entry in config file
 	UIS['sourcelistbox'].delete(0, tkinter.END)
@@ -78,11 +78,11 @@ def reload_config():
 	for w in UIS['source_detail'].winfo_children():
 		w.destroy()
 
-	print 'source' 
+	print 'source'
 	sources = {}
 	for src in CONFIGS['source'] if 'source' in CONFIGS else {}:
 		sources[src] = CONFIGS['source'][src] # get source sub-item
-		print '  name {0} version {1}'.format(src, sources[src]['version']) 
+		print '  name {0} version {1}'.format(src, sources[src]['version'])
 
 	for src in sources:
 		UIS['sourcelistbox'].insert(tkinter.END, src)
@@ -160,7 +160,7 @@ def update_source_detail(event):
 	lbx = event.widget # sender widget is listbox
 	index = int(lbx.curselection()[0]) # get current selection index (no multipleselction)
 	selection = lbx.get(index) # selection value
-#	print 'listbox selected index {}, value {}'.format(index, selection) 
+#	print 'listbox selected index {}, value {}'.format(index, selection)
 
 	logger.debug('CONFIGS: {0}'.format(CONFIGS))
 	for w in UIS['source_detail'].winfo_children(): # clear source_detail frame
@@ -168,7 +168,7 @@ def update_source_detail(event):
 
 	cur_source = CONFIGS['source'][selection] # get source item from selection key
 	UIS['cur_source'] = cur_source # update global current selected source
-	cur_source['name'] = selection 
+	cur_source['name'] = selection
 
 	UIS['status'].set('{0} {1}'.format(selection, cur_source['version']))
 
@@ -182,7 +182,7 @@ def update_source_detail(event):
 	make_btn = tkinter.Button(button_frame, text='build', command=build_source)
 	make_btn.pack(side=tkinter.RIGHT, padx=2, pady=2)
 
-	# show configuration arguments in source detail listbox 
+	# show configuration arguments in source detail listbox
 	tkinter.Label(UIS['source_detail'], text=cur_source['config_cmd'] if 'config_cmd' in cur_source else 'N/A').pack()
 
 	config_opts = tkinter.Listbox(UIS['source_detail'])
@@ -211,14 +211,14 @@ def build_source():
 	logger.debug('build_source: enter')
 
 	cur_source = UIS['cur_source'] # get current source to work with
-	print 'building ... {}-{}'.format(cur_source['name'], cur_source['version']) 
+	print 'building ... {}-{}'.format(cur_source['name'], cur_source['version'])
 
-	source_name = cur_source['name'] + '-' + cur_source['version']
+	source_name = cur_source['name'] + cur_source['version']
 	# build_dir only valid after configurator called
 	if 'build_dir' in cur_source:
 		build_dir = cur_source['build_dir']
 	else:
-		print 'build_dir not valid' 
+		print 'build_dir not valid'
 		#UIS['status'] = 'N/A'
 		return
 
@@ -238,38 +238,38 @@ def build_source():
 			for arg in raw_build_args:
 				for i in range(10): arg = os.path.expandvars(arg)
 				build_args.append(arg)
-				#print 'bld ', arg 
+				#print 'bld ', arg
 
-#	print 'source_name ', source_name 
-#	print 'build_dir ', build_dir 
-#	print 'build_cmd ', build_cmd 
-#	print 'build_args ', build_args 
+#	print 'source_name ', source_name
+#	print 'build_dir ', build_dir
+#	print 'build_cmd ', build_cmd
+#	print 'build_args ', build_args
 
 	ret = -1
 	args = {}
 
 	build_env = {}
-	for key, val in os.environ.items(): 
+	for key, val in os.environ.items():
 		build_env[key] = val # get system envs (include common env by loadconfig())
 
-	if ENV: 
-		print 'common envs' 
-		for key, val in ENV.items(): 
-			print '  ', key, val 
+	if ENV:
+		print 'common envs'
+		for key, val in ENV.items():
+			print '  ', key, val
 
 	source_env = cur_source['envs'] if 'envs' in cur_source else []
 	if source_env:
-		print 'source envs' 
+		print 'source envs'
 		for env in cur_source['envs']:
 			key, val = env.split('=')
-			for i in range(10): 
+			for i in range(10):
 				val = os.path.expandvars(val)
 			build_env[key] = val # add source env to config_env
-			print '  ', key, val 
+			print '  ', key, val
 #	else:
-#		print 'No source envs' 
-		
-	print 'using builder "{}"'.format(build_cmd) 
+#		print 'No source envs'
+
+	print 'using builder "{}"'.format(build_cmd)
 	args['task_name'] = source_name
 	args['env'] = build_env
 	args['working_dir'] = build_dir
@@ -278,7 +278,7 @@ def build_source():
 	ret = do_exec(args)
 
 	if ret == 0:
-		print 'INFO: build success ({0})'.format(ret) 
+		print 'INFO: build success ({0})'.format(ret)
 		UIS['status'].set('INFO: build success ({0})'.format(ret))
 		print
 	else:
@@ -295,9 +295,9 @@ def config_source():
 	global UIS # we modify UIS['cur_source']
 
 	cur_source = UIS['cur_source'] # get current source to work with
-	print 'configuring ... {}-{}'.format(cur_source['name'], cur_source['version']) 
+	print 'configuring ... {}{}'.format(cur_source['name'], cur_source['version'])
 
-	source_name = cur_source['name'] + '-' + cur_source['version']
+	source_name = cur_source['name'] + cur_source['version']
 	source_dir = os.path.join(CONFIGS['common']['source_dir'], source_name)
 	build_dir = os.path.join(CONFIGS['common']['build_dir'], source_name)
 	for i in range(10):
@@ -321,34 +321,34 @@ def config_source():
 				for i in range(10):
 					arg = os.path.expandvars(arg)
 				config_args.append(arg)
-				#print 'cfg ', arg 
+				#print 'cfg ', arg
 
 	config_env = {}
 	for key, val in os.environ.items():
 		config_env[key] = val # get system envs (include common env by loadconfig())
 
-	if ENV: 
-		print 'common envs' 
-		for key, val in ENV.items(): 
-			print '  ', key, val 
+	if ENV:
+		print 'common envs'
+		for key, val in ENV.items():
+			print '  ', key, val
 
 	source_env = cur_source['envs'] if 'envs' in cur_source else []
 	if source_env:
-		print 'source envs' 
+		print 'source envs'
 		for env in cur_source['envs']:
 			key, val = env.split('=')
-			for i in range(10): 
+			for i in range(10):
 				val = os.path.expandvars(val)
 			config_env[key] = val # add source env to config_env
-			print '  ', key, val 
+			print '  ', key, val
 #	else:
-#		print 'No source envs' 
-	
+#		print 'No source envs'
+
 	# configuring selection by type of configurator
 	ret = -1
 	args = {}
 	if config_cmd[0] == '.': # local configurator, e.g. ./configure, ./autogen.sh
-		print 'using local configurator "{}"'.format(config_cmd) 
+		print 'using local configurator "{}"'.format(config_cmd)
 		cur_source['build_dir'] = source_dir # pass build_dir to builder
 
 		args['task_name'] = source_name
@@ -358,23 +358,23 @@ def config_source():
 		args['arguments'] = config_args
 		ret = do_exec(args)
 	else: # system wide, e.g. cmake
-		print 'using system configurator "{}"'.format(config_cmd) 
+		print 'using system configurator "{}"'.format(config_cmd)
 		if not os.path.exists(build_dir):
 			os.makedirs(build_dir)
-		cur_source['build_dir'] = build_dir # pass build_dir to builder 
+		cur_source['build_dir'] = build_dir # pass build_dir to builder
 
 #		# this shoud be done in prebuid script
 #		cmakecache = os.path.join(build_dir, 'CMakeCache.txt')
 #		if os.path.exists(cmakecache):
-#			print 'removing CMakeCache.txt' 
+#			print 'removing CMakeCache.txt'
 #			os.remove(cmakecache)
-			
 
-#		print 'source_name ', source_name 
-#		print 'source_dir ', source_dir 
-#		print 'build_dir ', build_dir 
-#		print 'config_cmd ', config_cmd 
-#		print 'config_args ', config_args 
+
+#		print 'source_name ', source_name
+#		print 'source_dir ', source_dir
+#		print 'build_dir ', build_dir
+#		print 'config_cmd ', config_cmd
+#		print 'config_args ', config_args
 
 		args['task_name'] = source_name
 		args['env'] = config_env
@@ -384,11 +384,11 @@ def config_source():
 		ret = do_exec(args)
 
 	if ret == 0:
-		print 'INFO: configure success ({0})'.format(ret) 
+		print 'INFO: configure success ({0})'.format(ret)
 		UIS['status'].set('INFO: configure success ({0})'.format(ret))
 		print
 	else:
-		print 'ERROR: configure failed ({0})'.format(ret)  
+		print 'ERROR: configure failed ({0})'.format(ret)
 		UIS['status'].set('ERROR: configure failed ({0})'.format(ret))
 		print
 
@@ -396,7 +396,7 @@ def config_source():
 	return
 
 def initlogger(log_dir):
-	print 'initlogger: log_dir=', log_dir 
+	print 'initlogger: log_dir=', log_dir
 	if not os.path.exists(log_dir):
 		os.makedirs(log_dir)
 
@@ -416,7 +416,7 @@ def do_exec(args):
 	for w in UIS['frame_right'].winfo_children():
 		w.destroy()
 	UIS['output_text'] = tkinter.Text(UIS['frame_right'])
-	UIS['output_text'].pack(fill=tkinter.BOTH, expand=1) 
+	UIS['output_text'].pack(fill=tkinter.BOTH, expand=1)
 	UIS['error_text'] = tkinter.Text(UIS['frame_right'])
 	UIS['error_text'].pack(fill=tkinter.BOTH, expand=1)
 
@@ -430,7 +430,7 @@ def do_exec(args):
 	cmd_args = args['arguments'] # list of command argument eg. '['x', 'y', 'z']
 	wd = args['working_dir'] # working directory
 	if not os.path.exists(wd):
-		print 'WARNING: working directory {} not exists. This migth cause configuring fail'.format(wd) 
+		print 'WARNING: working directory {} not exists. This migth cause configuring fail'.format(wd)
 	env = args['env']
 
 	log_dir = CONFIGS['common']['log_dir']
@@ -443,20 +443,20 @@ def do_exec(args):
 	command = [cmd] + cmd_args
 
 	logger.info('command {0}'.format(command))
-	print 'command ', command 
-#	print 'command_text', ' '.join(command) 
-	print 'wd ', wd 
-#	print 'env ' 
+	print 'command ', command
+#	print 'command_text', ' '.join(command)
+	print 'wd ', wd
+#	print 'env '
 #	for key, val in env.items():
-#		print '   {} - {}'.format(key, val) 
+#		print '   {} - {}'.format(key, val)
 	ret=subprocess.Popen(command, env=env, shell=False, cwd=wd, stdout=subprocess.PIPE, stderr=cerr)
 
 	pad=' ' * (TERM_WIDTH + 5)
 	while True:
 		cout_line=ret.stdout.readline()
 		if cout_line:
-			#print pad, end='\r' 
-			#print '==', cout_line.decode('utf-8')[0:TERM_WIDTH].replace('\n','\r'), end='\r' 
+			#print pad, end='\r'
+			#print '==', cout_line.decode('utf-8')[0:TERM_WIDTH].replace('\n','\r'), end='\r'
 			UIS['status'].set(cout_line.decode('utf-8')[0:TERM_WIDTH])
 			UIS['frame_right'].update_idletasks()
 			cout.write(cout_line)
@@ -499,7 +499,7 @@ def loadconfig(filename=''):
 	if(filename == ''):
 		filename = os.path.dirname(os.path.abspath(__file__)) + '/build_source.conf'
 
-	print 'using configfile ', filename 
+	print 'using configfile ', filename
 
 	try:
 		config_file = open(filename)
@@ -508,25 +508,28 @@ def loadconfig(filename=''):
 		# set common env
 		for env in config['common']['envs']:
 			key, val = env.split('=')
-			for i in range(10): 
+			for i in range(10):
 				val = os.path.expandvars(val)
 			ENV[key] = val
 			os.environ[key] = val # also pass common env to system (for used in var expansion)
-			#print key,'=', val 
+			#print key,'=', val
 
-		# expand all vars in common section, let system handle vars in command argument 
+		# expand all vars in common section, let system handle vars in command argument
 		# this allow ~/xxx (or ${env}/xxx in future) in config file
 		for i in range(10): #FIXME:ASSUMPTION: env should not nest this deep
 			config['common']['source_dir']	= os.path.expandvars(config['common']['source_dir'])
 			config['common']['build_dir']	= os.path.expandvars(config['common']['build_dir'])
 			config['common']['log_dir']	= os.path.expandvars(config['common']['log_dir'])
-	except:
-		print 'ERROR: can\'t open configuration file \'{0}\''.format(os.path.join(os.getcwd(), filename)) 
-		print '       Please check that file exists and YAML-valid' 
-		print sys.exc_info() 
+	except IOError:
+		print 'ERROR <IOError>: can\'t open configuration file \'{0}\''.format(os.path.join(os.getcwd(), filename))
+		print '       Please check that file exists'
+	except :
+		print 'ERROR: can\'t open configuration file \'{0}\''.format(os.path.join(os.getcwd(), filename))
+		print '       Please check that file exists and YAML-valid'
+		print sys.exc_info()
 	finally:
 		config_file.close()
-		#print config 
+		#print config
 
 	return config
 
